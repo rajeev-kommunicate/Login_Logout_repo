@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,14 +20,12 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-
 
 import com.applozic.mobicomkit.api.account.register.RegistrationResponse;
 
@@ -35,10 +34,11 @@ import io.kommunicate.Kommunicate;
 import io.kommunicate.callbacks.KMLoginHandler;
 import io.kommunicate.callbacks.KmCallback;
 
-
 public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     final String TAG = "LoginActivity";
+    EditText usernameInput;
+    EditText passwordInput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,13 +48,22 @@ public class LoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         Button loginButton = findViewById(R.id.buttonLogin);
-        final EditText usernameInput = findViewById(R.id.usernameInput);
-        final EditText passwordInput =  findViewById(R.id.passwordInput);
+        usernameInput = findViewById(R.id.usernameInput);
+        passwordInput = findViewById(R.id.passwordInput);
 
         loginButton.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
-                login(usernameInput.getText().toString(),passwordInput.getText().toString() );
+
+                if (Patterns.EMAIL_ADDRESS.matcher(usernameInput.getText().toString()).matches()) {
+                    login(usernameInput.getText().toString(), passwordInput.getText().toString());
+                }
+
+                else {
+
+                    Toast.makeText(LoginActivity.this, "Please Enter a valid Email ID", Toast.LENGTH_SHORT).show();
+                }
 
             }
         });
@@ -68,11 +77,10 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-
     private void login(String email, String password) {
 
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this,
+                new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
@@ -88,8 +96,7 @@ public class LoginActivity extends AppCompatActivity {
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                         }
 
                     }
@@ -101,38 +108,39 @@ public class LoginActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        FirebaseUser user =  mAuth.getCurrentUser();
-        if(user != null) {
+        FirebaseUser user = mAuth.getCurrentUser();
+
+        if (user != null) {
             startActivity(new Intent(LoginActivity.this, ProfileActivity.class));
             finish();
         }
     }
 
-    public void btnOnClick (View view){
+    public void btnOnClick(View view) {
         Kommunicate.init(this, "f52574e79812dd83de49431ac027ccb0");
 
         Kommunicate.loginAsVisitor(this, new KMLoginHandler() {
             @Override
             public void onSuccess(RegistrationResponse registrationResponse, Context context) {
-                // You can perform operations such as opening the conversation, creating a new conversation or update user details on success
-                new KmConversationBuilder(context)
-                        .setWithPreChat(true)
-                        .launchConversation(new KmCallback() {
-                            @Override
-                            public void onSuccess(Object message) {
-                                Log.d("Conversation", "Success : " + message);
-                            }
+                // You can perform operations such as opening the conversation, creating a new
+                // conversation or update user details on success
+                new KmConversationBuilder(context).setWithPreChat(true).launchConversation(new KmCallback() {
+                    @Override
+                    public void onSuccess(Object message) {
+                        Log.d("Conversation", "Success : " + message);
+                    }
 
-                            @Override
-                            public void onFailure(Object error) {
-                                Log.d("Conversation", "Failure : " + error);
-                            }
-                        });
+                    @Override
+                    public void onFailure(Object error) {
+                        Log.d("Conversation", "Failure : " + error);
+                    }
+                });
             }
 
             @Override
             public void onFailure(RegistrationResponse registrationResponse, Exception exception) {
-                // You can perform actions such as repeating the login call or throw an error message on failure
+                // You can perform actions such as repeating the login call or throw an error
+                // message on failure
             }
         });
 

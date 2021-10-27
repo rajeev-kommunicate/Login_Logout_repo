@@ -29,6 +29,20 @@
         android:padding="10dp"
         android:textAllCaps="false"
 
+    <Button
+        android:id="@+id/buttonpchat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="180dp"
+        android:onClick="btnpOnClick"
+        android:text="Tap to Chat"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.871"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonLogout"
+
+    
 
         />
 
